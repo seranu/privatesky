@@ -77,7 +77,7 @@ function launchDomainSandbox(name, configuration) {
             }
         });
 
-        const child = childProcess.fork(path.join(__dirname,'sandboxes/domainSandbox.js'), [name], {cwd: __dirname, env: child_env});
+        const child = childProcess.fork(path.join(__dirname,'sandboxes/domain.js'), [name], {cwd: __dirname, env: child_env});
         child.on('exit', (code, signal) => {
             setTimeout(()=>{
                 console.log(`DomainSandbox [${name}] got an error code ${code}. Restarting...`);
