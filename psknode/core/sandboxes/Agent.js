@@ -20,8 +20,6 @@ function Agent(constitutions, workingDir, strategy) {
     };
 
     const workerPool = new WorkerPool(path.resolve(path.join(__dirname, './AgentWorker.js')), options);
-    // serializare swarm-uri din workers
-    // agentii iau din workeri prin postMessage si trimit spre domeniu -> virtualMQ
 
 
     this.executeSwarm = function(swarm, callback) {

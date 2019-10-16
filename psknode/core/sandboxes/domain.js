@@ -20,7 +20,7 @@ const {AgentsManager} = require('./AgentsManager');
 
 $$.PSK_PubSub = require("soundpubsub").soundPubSub;
 
-$$.log(`Booting domain sandbox...`);
+$$.log(`Booting domain sandbox... ${process.env.PRIVATESKY_DOMAIN_NAME}`);
 const domain = JSON.parse(process.env.config);
 
 if(typeof domain.constitution !== "undefined" && domain.constitution !== "undefined"){
@@ -67,6 +67,16 @@ process.nextTick(() => { // to give time to initialize all top level variables
             connectToRemote(alias, remoteUrl);
         }
     }
+
+    setTimeout(()=>{
+        for(let alias in domain.localInterfaces){
+            if(domain.localInterfaces.hasOwnProperty(alias)) {
+
+                let path = domain.localInterfaces[alias];
+                connectLocally(alias, path);
+            }
+        }
+    }, 100);
 });
 
 
@@ -100,4 +110,44 @@ function connectToRemote(alias, remoteUrl){
     $$.remote[alias].on('*', '*', function (err, res) {
         $$.PSK_PubSub.publish($$.CONSTANTS.SWARM_FOR_EXECUTION, res);
     });
+}
+
+let localReplyHandlerSet = false;
+const queues = {};
+
+function connectLocally(alias, path2folder){
+    if(!queues[alias]){
+        path2folder = path.resolve(path2folder);
+        fs.mkdir(path2folder, {recursive: true}, (err, res)=>{
+            const queue = folderMQ.createQue(path2folder, (err, res) => {
+                if(!err){
+                    console.log(`\n[***]Alias <${alias}> listening local on ${path2folder}\n`);
+                }
+            });
+            queue.registerConsumer((err, swarm) => {
+                if(!err){
+                    $$.PSK_PubSub.publish($$.CONSTANTS.SWARM_FOR_EXECUTION, swarm);
+                }
+            });
+            queues[alias] = queue;
+        });
+    }else{
+        console.log(`Alias ${alias} has already a local queue attached.`);
+    }
+
+    if(!localReplyHandlerSet){
+        $$.PSK_PubSub.subscribe($$.CONSTANTS.SWARM_RETURN, (swarm) => {
+            const urlRegex = new RegExp(/^(www|http:|https:)+[^\s]+[\w]/);
+            if (swarm && swarm.meta && swarm.meta.target && !urlRegex.test(swarm.meta.target)) {
+                var q = folderMQ.createQue(swarm.meta.target, (err, res)=>{
+                    if(!err){
+                        q.getHandler().sendSwarmForExecution(swarm)
+                    }else{
+                        console.log(`Unable to send to folder ${swarm.meta.target} swarm with id $swarm.meta.id`);
+                    }
+                });
+            }
+        }, () => true);
+        localReplyHandlerSet = true;
+    }
 }

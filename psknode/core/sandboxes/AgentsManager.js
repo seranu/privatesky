@@ -33,7 +33,6 @@ function AgentsManager({constitutions, workDir}) {
 
     }
 
-    this.executeSwarm = executeSwarm
 }
 
 module.exports = {AgentsManager};
