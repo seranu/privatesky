@@ -18,6 +18,7 @@ function WorkerPool(workerFilePath, workerOptions, numberOfWorkers = os.cpus().l
             callback(new Error('Unavailable workers'));
             return;
         }
+
         addWorkerListeners(worker, callback);
 
         worker.postMessage(task);
@@ -36,7 +37,11 @@ function WorkerPool(workerFilePath, workerOptions, numberOfWorkers = os.cpus().l
         }
 
         function onMessage(...args) {
-            callbackWrapper(undefined, ...args);
+            if(args[0] instanceof Error) {
+                callbackWrapper(...args);
+            } else {
+                callbackWrapper(undefined, ...args);
+            }
         }
 
         function onError(err) {

@@ -1,7 +1,6 @@
 const {parentPort, workerData} = require('worker_threads');
 
-
-if(!workerData.hasOwnProperty('constitutions')) {
+if (!workerData.hasOwnProperty('constitutions')) {
     throw new Error(`Did not receive the correct configuration in worker data ${JSON.stringify(workerData)}`);
 }
 
@@ -10,25 +9,26 @@ for (const constitution of workerData.constitutions) {
 }
 
 
+const beesHealer = require('swarmutils').beesHealer;
+
 parentPort.on('message', (swarm) => {
     try {
+        // needed when domain won't have to deserialize the swarm
         if (typeof swarm === 'string') {
             swarm = JSON.parse(swarm);
         }
     } catch (e) {
-        console.error('could not parse swarm', swarm, e);
-        parentPort.postMessage('error') // treat this error
+        parentPort.postMessage(e) // treat this error
     }
 
-    console.log('got swarm', swarm);
     global.$$.swarmsInstancesManager.revive_swarm(swarm);
 });
 
 
-$$.PSK_PubSub.subscribe($$.CONSTANTS.SWARM_FOR_EXECUTION, function(swarm){
-    // serialize swarm in the future
-    delete swarm['__transmisionIndex']; // otherwise the pubSub in agentsManager will think the message was already processed
-    parentPort.postMessage(swarm);
+$$.PSK_PubSub.subscribe($$.CONSTANTS.SWARM_FOR_EXECUTION, function (swarm) {
+    const newSwarm = beesHealer.asJSON(swarm, swarm.getMeta('phaseName'), swarm.getMeta('args'));
+
+    parentPort.postMessage(newSwarm);
 });
 
 
