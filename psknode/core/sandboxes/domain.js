@@ -52,7 +52,7 @@ $$.blockchain.start(()=>{
 $$.log("Loading constitution file", process.env.PRIVATESKY_DOMAIN_CONSTITUTION);
 // require(process.env.PRIVATESKY_DOMAIN_CONSTITUTION);
 
-const agentsManager = new AgentsManager({
+new AgentsManager({
     constitutions: [
         path.resolve(`${__dirname}/../../bundles/pskruntime.js`),
         path.resolve(process.env.PRIVATESKY_DOMAIN_CONSTITUTION)

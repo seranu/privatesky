@@ -53,7 +53,7 @@ function WorkerPool(workerFilePath, workerOptions, numberOfWorkers = os.cpus().l
 
         worker.once('message', onMessage);
         worker.once('error', onError);
-        worker.once('exit', onError);
+        worker.once('exit', onExit);
 
         function removeListeners() {
             worker.removeListener('message', onMessage);
