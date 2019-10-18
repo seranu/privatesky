@@ -16,7 +16,7 @@ require('psk-http-client');
 const folderMQ = require("foldermq");
 const fs = require('fs');
 const msgpack = require('@msgpack/msgpack');
-const {AgentsManager} = require('./AgentsManager');
+const {ManagerForAgents} = require('./ManagerForAgents');
 
 $$.PSK_PubSub = require("soundpubsub").soundPubSub;
 
@@ -52,7 +52,7 @@ $$.blockchain.start(()=>{
 $$.log("Loading constitution file", process.env.PRIVATESKY_DOMAIN_CONSTITUTION);
 // require(process.env.PRIVATESKY_DOMAIN_CONSTITUTION);
 
-new AgentsManager({
+new ManagerForAgents({
     constitutions: [
         path.resolve(`${__dirname}/../../bundles/pskruntime.js`),
         path.resolve(process.env.PRIVATESKY_DOMAIN_CONSTITUTION)

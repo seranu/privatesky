@@ -2,8 +2,8 @@ const {Agent} = require('./Agent');
 const OwM = require('swarmutils').OwM;
 
 
-function AgentsManager({constitutions, workDir}) {
-    if (!this instanceof AgentsManager) {
+function ManagerForAgents({constitutions, workDir}) {
+    if (!this instanceof ManagerForAgents) {
         throw new TypeError('Calling this constructor without new is forbidden');
     }
 
@@ -53,4 +53,4 @@ function AgentsManager({constitutions, workDir}) {
 
 }
 
-module.exports = {AgentsManager};
+module.exports = {ManagerForAgents};
