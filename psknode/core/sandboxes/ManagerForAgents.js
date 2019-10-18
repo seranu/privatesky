@@ -1,13 +1,10 @@
-const {Agent} = require('./Agent');
+const {getAgent, AgentStrategies} = require('./Agent');
 const OwM = require('swarmutils').OwM;
 
 
 function ManagerForAgents({constitutions, workDir}) {
-    if (!this instanceof ManagerForAgents) {
-        throw new TypeError('Calling this constructor without new is forbidden');
-    }
 
-    const generalAgent = new Agent(constitutions, workDir, 'threads');
+    const generalAgent = getAgent(constitutions, workDir, AgentStrategies.THREADS);
     $$.PSK_PubSub.subscribe($$.CONSTANTS.SWARM_FOR_EXECUTION, executeSwarm, filterSwarmsExecutionRequests);
 
     function isOwnAgent(agent) {
