@@ -132,7 +132,7 @@ function PoolManager(workerFilePath, workerOptions, numberOfWorkers) {
 
     /** @param {Worker} worker */
     this.removeWorker = function (worker) {
-        pool = pool.filter(worker => worker.worker === worker);
+        pool = pool.filter(poolWorker => poolWorker.worker === worker);
     };
 
 
