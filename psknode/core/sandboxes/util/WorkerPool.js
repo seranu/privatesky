@@ -1,6 +1,10 @@
-const {Worker} = require('worker_threads');
-const os = require('os');
+const {EventEmitter} = require('events');
 const fs = require('fs');
+const os = require('os');
+const util = require('util');
+const Queue = require('swarmutils').Queue;
+const {Worker} = require('worker_threads');
+
 
 function WorkerPool(workerFilePath, workerOptions, numberOfWorkers = os.cpus().length) {
     if (!fs.existsSync(workerFilePath)) {
@@ -8,21 +12,35 @@ function WorkerPool(workerFilePath, workerOptions, numberOfWorkers = os.cpus().l
     }
 
     const poolManager = new PoolManager(workerFilePath, workerOptions, numberOfWorkers);
+    const taskQueue = new Queue();
 
     this.addTask = function (task, callback) {
         const worker = poolManager.getAvailableWorker();
 
         if (!worker) {
-            // add task to a queue
-            // decline task for now (for testing)
-            callback(new Error('Unavailable workers'));
-            return;
+            taskQueue.push({task, callback});
+            return false;
         }
 
         addWorkerListeners(worker, callback);
 
         worker.postMessage(task);
+        return true;
     };
+
+    poolManager.on('freedWorker', () => {
+        if(taskQueue.isEmpty()) {
+           return;
+        }
+
+        const nextTask = taskQueue.front();
+
+        const taskWasAcceptedByAWorker = this.addTask(nextTask.task, nextTask.callback);
+
+        if (taskWasAcceptedByAWorker) {
+            taskQueue.pop();
+        }
+    });
 
     /**
      * @param {Worker} worker
@@ -37,7 +55,7 @@ function WorkerPool(workerFilePath, workerOptions, numberOfWorkers = os.cpus().l
         }
 
         function onMessage(...args) {
-            if(args[0] instanceof Error) {
+            if (args[0] instanceof Error) {
                 callbackWrapper(...args);
             } else {
                 callbackWrapper(undefined, ...args);
@@ -70,6 +88,8 @@ function WorkerPool(workerFilePath, workerOptions, numberOfWorkers = os.cpus().l
 
 
 function PoolManager(workerFilePath, workerOptions, numberOfWorkers) {
+    EventEmitter.call(this);
+
     let pool = [];
 
     /** @returns {Worker|null} */
@@ -107,6 +127,7 @@ function PoolManager(workerFilePath, workerOptions, numberOfWorkers) {
 
         // if worker is found, set its state to not working
         pool[freeWorkerIndex].isWorking = false;
+        this.emit('freedWorker');
     };
 
     /** @param {Worker} worker */
@@ -133,5 +154,6 @@ function PoolManager(workerFilePath, workerOptions, numberOfWorkers) {
     }
 }
 
+util.inherits(PoolManager, EventEmitter);
 
 module.exports = WorkerPool;
