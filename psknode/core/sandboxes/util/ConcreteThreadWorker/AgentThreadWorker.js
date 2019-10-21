@@ -8,7 +8,6 @@ for (const constitution of workerData.constitutions) {
     require(constitution);
 }
 
-
 const beesHealer = require('swarmutils').beesHealer;
 
 parentPort.on('message', (swarm) => {
@@ -30,6 +29,4 @@ $$.PSK_PubSub.subscribe($$.CONSTANTS.SWARM_FOR_EXECUTION, function (swarm) {
 
     parentPort.postMessage(newSwarm);
 });
-
-
 

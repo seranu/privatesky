@@ -1,6 +1,5 @@
+const AgentStrategies = require('./util/AgentStrategies');
 const fs = require('fs');
-const WorkerPool = require('./util/WorkerPool');
-const path = require('path');
 
 /**
  *
@@ -19,11 +18,11 @@ function getAgent(constitutions, workingDir, strategy) {
     }
 
     if(strategy === AgentStrategies.THREADS) {
-        const AgentWithThreads = require('./util/AgentWithThreads');
+        const AgentWithThreads = require('./util/ConcreteThreadWorker/AgentWithThreads');
 
         return new AgentWithThreads(constitutions, workingDir);
     } else {
-        const AgentWithIsolates = require('./util/AgentWithIsolates');
+        const AgentWithIsolates = require('./util/ConcreteIsolatesWorker/AgentWithIsolates');
 
         return new AgentWithIsolates(constitutions, workingDir);
     }
@@ -34,9 +33,5 @@ function doesStrategyExists(strategy) {
 }
 
 
-const AgentStrategies = {
-    THREADS: 'threads',
-    ISOLATES: 'isolates'
-};
 
-module.exports = {getAgent, AgentStrategies};
+module.exports = {getAgent};

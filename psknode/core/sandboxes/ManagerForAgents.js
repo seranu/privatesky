@@ -1,5 +1,6 @@
-const {getAgent, AgentStrategies} = require('./Agent');
+const AgentStrategies = require('./util/AgentStrategies');
 const OwM = require('swarmutils').OwM;
+const {getAgent} = require('./Agent');
 
 
 function ManagerForAgents({constitutions, workDir}) {
