@@ -3,14 +3,9 @@ const fs = require('fs');
 const os = require('os');
 const util = require('util');
 const {EventEmitter} = require('events');
-const {Worker} = require('worker_threads');
 
-function PoolManager(workerFilePath, workerOptions, agentStrategy, numberOfWorkers = os.cpus().length) {
+function PoolManager(options, agentStrategy, numberOfWorkers = os.cpus().length) {
     EventEmitter.call(this);
-
-    if (!fs.existsSync(workerFilePath)) {
-        throw new Error(`Path to worker script does not exists ${workerFilePath}`);
-    }
 
     let pool = [];
 
@@ -69,11 +64,14 @@ function PoolManager(workerFilePath, workerOptions, agentStrategy, numberOfWorke
     }
 
     const createThreadsWorker = () => {
+        const {Worker} = require('worker_threads');
+
         if (pool.length >= numberOfWorkers) {
             return null;
         }
 
-        const worker = new Worker(workerFilePath, workerOptions);
+        const {fileName, workerOptions} = options;
+        const worker = new Worker(fileName, workerOptions);
 
         const workerObj = {
             isWorking: false,
@@ -88,9 +86,24 @@ function PoolManager(workerFilePath, workerOptions, agentStrategy, numberOfWorke
         });
     };
 
-    const createIsolatesWorker = () => {}
+    const createIsolatesWorker = () => {
+        const getAgentIsolatesWorker = require('./ConcreteIsolatesWorker/AgentIsolatesWorker');
 
+        getAgentIsolatesWorker(options.workerOptions)
+            .then(worker => {
+                const workerObj = {
+                    isWorking: false,
+                    worker: worker
+                };
 
+                pool.push(workerObj);
+
+                this.emit('freedWorker');
+            })
+            .catch(err => {
+                $$.error('Failed creating isolates worker', err);
+            })
+    }
 }
 
 util.inherits(PoolManager, EventEmitter);
