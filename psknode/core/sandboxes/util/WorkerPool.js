@@ -1,9 +1,10 @@
 const Queue = require('swarmutils').Queue;
 const {Worker} = require('worker_threads');
 
-
+/** @type {PoolManager} */
 function WorkerPool(poolManager) {
 
+    const PoolManagerEvents = poolManager.events;
     const taskQueue = new Queue();
 
     this.addTask = function (task, callback) {
@@ -20,7 +21,7 @@ function WorkerPool(poolManager) {
         return true;
     };
 
-    poolManager.on('freedWorker', () => {
+    poolManager.on(PoolManagerEvents.RELEASED_WORKER, () => {
         if(taskQueue.isEmpty()) {
            return;
         }

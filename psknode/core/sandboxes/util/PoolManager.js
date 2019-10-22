@@ -1,8 +1,11 @@
 const AgentStrategies = require('./AgentStrategies');
-const fs = require('fs');
 const os = require('os');
 const util = require('util');
 const {EventEmitter} = require('events');
+
+const PoolManagerEvents = {
+    RELEASED_WORKER: 'releasedWorker'
+};
 
 function PoolManager(options, agentStrategy, numberOfWorkers = os.cpus().length) {
     EventEmitter.call(this);
@@ -44,7 +47,7 @@ function PoolManager(options, agentStrategy, numberOfWorkers = os.cpus().length)
 
         // if worker is found, set its state to not working
         pool[freeWorkerIndex].isWorking = false;
-        this.emit('freedWorker');
+        this.emit(PoolManagerEvents.RELEASED_WORKER);
     };
 
     /** @param {Worker} worker */
@@ -54,9 +57,9 @@ function PoolManager(options, agentStrategy, numberOfWorkers = os.cpus().length)
 
 
     function createNewWorker() {
-        if(agentStrategy === AgentStrategies.THREADS) {
+        if (agentStrategy === AgentStrategies.THREADS) {
             createThreadsWorker();
-        } else if(agentStrategy === AgentStrategies.ISOLATES) {
+        } else if (agentStrategy === AgentStrategies.ISOLATES) {
             createIsolatesWorker();
         } else {
             $$.error(`Unknown strategy ${agentStrategy}`);
@@ -82,7 +85,7 @@ function PoolManager(options, agentStrategy, numberOfWorkers = os.cpus().length)
 
         // delay this, otherwise is synchronous and tasks will be delayed too much
         setImmediate(() => {
-            this.emit('freedWorker');
+            this.emit(PoolManagerEvents.RELEASED_WORKER);
         });
     };
 
@@ -98,16 +101,15 @@ function PoolManager(options, agentStrategy, numberOfWorkers = os.cpus().length)
 
                 pool.push(workerObj);
 
-                this.emit('freedWorker');
+                this.emit(PoolManagerEvents.RELEASED_WORKER);
             })
             .catch(err => {
                 $$.error('Failed creating isolates worker', err);
-            })
+            });
     }
 }
 
 util.inherits(PoolManager, EventEmitter);
+PoolManager.prototype.events = PoolManagerEvents;
 
-module.exports = {
-    PoolManager
-};
+module.exports = PoolManager;

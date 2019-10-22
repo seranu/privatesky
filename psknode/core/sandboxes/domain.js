@@ -48,9 +48,8 @@ $$.blockchain.start(()=>{
     $$.log("blockchain loaded!");
 });
 
-//loading swarm definitions
-$$.log("Loading constitution file", process.env.PRIVATESKY_DOMAIN_CONSTITUTION);
-// require(process.env.PRIVATESKY_DOMAIN_CONSTITUTION);
+
+$$.log("Agents will be using constitution file", process.env.PRIVATESKY_DOMAIN_CONSTITUTION);
 
 new ManagerForAgents({
     constitutions: [

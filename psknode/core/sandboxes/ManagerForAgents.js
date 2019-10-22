@@ -5,6 +5,7 @@ const {getAgent} = require('./Agent');
 
 function ManagerForAgents({constitutions, workDir}) {
 
+    // TODO: add capability to initialize more agents
     const generalAgent = getAgent(constitutions, workDir, AgentStrategies.THREADS);
     $$.PSK_PubSub.subscribe($$.CONSTANTS.SWARM_FOR_EXECUTION, executeSwarm, filterSwarmsExecutionRequests);
 
