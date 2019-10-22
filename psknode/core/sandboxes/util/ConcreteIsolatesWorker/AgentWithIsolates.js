@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const AgentStrategies = require('../AgentStrategies');
-const {PoolManager} = require('../PoolManager');
+const PoolManager = require('../PoolManager');
 const WorkerPool = require('../WorkerPool');
 
 

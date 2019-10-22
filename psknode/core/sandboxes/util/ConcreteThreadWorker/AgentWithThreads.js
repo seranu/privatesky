@@ -1,7 +1,7 @@
 const AgentStrategies = require('../AgentStrategies');
 const path = require('path');
 const WorkerPool = require('../WorkerPool');
-const {PoolManager} = require('../PoolManager');
+const PoolManager = require('../PoolManager');
 
 
 function AgentWithThreads(constitutions, workingDir) {
