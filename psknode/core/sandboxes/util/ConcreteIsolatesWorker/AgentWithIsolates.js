@@ -2,17 +2,17 @@ const fs = require("fs");
 const path = require("path");
 const AgentStrategies = require('../AgentStrategies');
 const {PoolManager} = require('../PoolManager');
-const {WorkerPool} = require('../WorkerPool');
+const WorkerPool = require('../WorkerPool');
 
 
 function AgentWithIsolates(constitutions, workingDir) {
 
-    const shimsBundle = fs.readFileSync(path.join(__dirname, '../../../bundles/sandboxBase.js'));
-    const pskruntime = fs.readFileSync(path.join(__dirname, "../../../bundles/pskruntime.js"));
-    const pskNode = fs.readFileSync(path.join(__dirname, "../../../bundles/psknode.js"));
+    const shimsBundle = fs.readFileSync(path.join(__dirname, '../../../../bundles/sandboxBase.js'), 'utf8');
+    const pskruntime = fs.readFileSync(path.join(__dirname, "../../../../bundles/pskruntime.js"), 'utf8');
+    const pskNode = fs.readFileSync(path.join(__dirname, "../../../../bundles/psknode.js"), 'utf8');
 
     constitutions = constitutions.map(constitutionPath => {
-        return fs.readFileSync(constitutionPath);
+        return fs.readFileSync(constitutionPath, 'utf8');
     });
 
     const workerOptions = {
@@ -29,8 +29,13 @@ function AgentWithIsolates(constitutions, workingDir) {
     const workerPool = new WorkerPool(poolManager);
 
     this.executeSwarm = function(swarm, callback) {
+        workerPool.addTask(swarm, (err, swarm) => {
+            if(err) {
+                return callback(err);
+            }
 
-        workerPool.addTask(swarm, callback);
+            callback(err, JSON.parse(swarm));
+        });
     };
 
 }

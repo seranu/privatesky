@@ -1,8 +1,7 @@
 const beesHealer = require('swarmutils').beesHealer;
 const IsolatedVM = require('../../../../../modules/pskisolates');
-const path = require('path');
-const util = require('util');
 const {EventEmitter} = require('events');
+const OwM = require('swarmutils').OwM;
 
 async function getAgentIsolatesWorker({shimsBundle, constitutions}, workingDir) {
 
@@ -19,18 +18,41 @@ async function getAgentIsolatesWorker({shimsBundle, constitutions}, workingDir) 
         config: config
     });
 
-    isolate.globalSetSync('returnSwarm', function (swarm) {
-        this.emit('message', swarm);
+    class IsolatesWrapper extends EventEmitter {
+        postMessage(swarm) {
+            const phaseName = OwM.prototype.getMetaFrom(swarm, 'phaseName');
+            const args = OwM.prototype.getMetaFrom(swarm, 'args');
+            const serializedSwarm = beesHealer.asJSON(swarm, phaseName, args);
+            const stringifiedSwarm = JSON.stringify(serializedSwarm);
+
+            isolate.run(`
+				global.$$.swarmsInstancesManager.revive_swarm(JSON.parse('${stringifiedSwarm}'));
+			`).catch((err) => {
+                this.emit('error', err);
+            });
+        }
+    }
+
+    const isolatesWrapper = new IsolatesWrapper();
+
+    isolate.globalSetSync('returnSwarm', (swarm) => {
+        isolatesWrapper.emit('message', swarm);
     });
+
 
     await isolate.run(`
             require("callflow").swarmInstanceManager;
-            const beesHealer = require('swarmutils').beesHealer;
+            const swarmutils = require('swarmutils');
+            const beesHealer = swarmutils.beesHealer;
+            const OwM = swarmutils.OwM;
         
             global.$$.PSK_PubSub.subscribe($$.CONSTANTS.SWARM_FOR_EXECUTION, function(swarm){
-                console.log("returning");
+                const phaseName = OwM.prototype.getMetaFrom(swarm, 'phaseName');
+                const args = OwM.prototype.getMetaFrom(swarm, 'args');
+                const serializedSwarm = beesHealer.asJSON(swarm, phaseName, args);
+                const stringifiedSwarm = JSON.stringify(serializedSwarm);
                
-                returnSwarm.apply(undefined, [beesHealer.asJSON(swarm)]);
+                returnSwarm.apply(undefined, [stringifiedSwarm]);
             });
 		`);
 
@@ -47,21 +69,9 @@ async function getAgentIsolatesWorker({shimsBundle, constitutions}, workingDir) 
 
     }, 10 * 1000); // 10 seconds
 
-    function IsolatesWrapper() {
-        EventEmitter.call(this);
 
-        this.postMessage = function(swarm) {
-            isolate.run(`
-				global.$$.swarmsInstancesManager.revive_swarm(JSON.parse('${beesHealer.asJSON(swarm)}'));
-			`).catch((err) => {
-                this.emit('error', err);
-            });
-        }
-    }
 
-    util.inherits(IsolatesWrapper, EventEmitter);
-
-    return new IsolatesWrapper();
+    return isolatesWrapper;
 }
 
 
