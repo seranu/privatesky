@@ -1,7 +1,8 @@
 const AgentStrategies = require('../AgentStrategies');
 const path = require('path');
-const WorkerPool = require('../WorkerPool');
 const PoolManager = require('../PoolManager');
+const SwarmPacker = require("swarmutils").SwarmPacker;
+const WorkerPool = require('../WorkerPool');
 
 
 function AgentWithThreads(constitutions, workingDir) {
@@ -18,8 +19,8 @@ function AgentWithThreads(constitutions, workingDir) {
     const poolManager = new PoolManager(poolOptions, AgentStrategies.THREADS);
     const workerPool = new WorkerPool(poolManager);
 
-    this.executeSwarm = function(swarm, callback) {
-        workerPool.addTask(swarm, callback);
+    this.executeSwarm = function(packedSwarm, callback) {
+        workerPool.addTask(packedSwarm, callback);
     };
 }
 

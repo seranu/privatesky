@@ -1,7 +1,9 @@
 const beesHealer = require('swarmutils').beesHealer;
 const IsolatedVM = require('../../../../../modules/pskisolates');
 const {EventEmitter} = require('events');
-const OwM = require('swarmutils').OwM;
+const swarmUtils = require('swarmutils');
+const OwM = swarmUtils.OwM;
+const SwarmPacker = swarmUtils.SwarmPacker;
 
 async function getAgentIsolatesWorker({shimsBundle, constitutions}, workingDir) {
 
@@ -19,7 +21,9 @@ async function getAgentIsolatesWorker({shimsBundle, constitutions}, workingDir) 
     });
 
     class IsolatesWrapper extends EventEmitter {
-        postMessage(swarm) {
+        postMessage(packedSwarm) {
+            const swarm = SwarmPacker.unpack(packedSwarm);
+
             const phaseName = OwM.prototype.getMetaFrom(swarm, 'phaseName');
             const args = OwM.prototype.getMetaFrom(swarm, 'args');
             const serializedSwarm = beesHealer.asJSON(swarm, phaseName, args);
@@ -36,7 +40,10 @@ async function getAgentIsolatesWorker({shimsBundle, constitutions}, workingDir) 
     const isolatesWrapper = new IsolatesWrapper();
 
     isolate.globalSetSync('returnSwarm', (swarm) => {
-        isolatesWrapper.emit('message', swarm);
+        const newSwarm = new OwM(JSON.parse(swarm));
+        const packedSwarm = SwarmPacker.pack(newSwarm);
+
+        isolatesWrapper.emit('message', packedSwarm);
     });
 
 

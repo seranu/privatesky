@@ -8,16 +8,17 @@ for (const constitution of workerData.constitutions) {
     require(constitution);
 }
 
-const beesHealer = require('swarmutils').beesHealer;
+const swarmUtils = require("swarmutils");
+const beesHealer = swarmUtils.beesHealer;
+const SwarmPacker = swarmUtils.SwarmPacker;
 
-parentPort.on('message', (swarm) => {
+parentPort.on('message', (packedSwarm) => {
+    let swarm = null;
     try {
-        // needed when domain won't have to deserialize the swarm
-        if (typeof swarm === 'string') {
-            swarm = JSON.parse(swarm);
-        }
+        swarm = SwarmPacker.unpack(packedSwarm);
     } catch (e) {
-        parentPort.postMessage(e) // treat this error
+        parentPort.postMessage(e); // treat this error
+        return;
     }
 
     global.$$.swarmsInstancesManager.revive_swarm(swarm);
@@ -26,7 +27,8 @@ parentPort.on('message', (swarm) => {
 
 $$.PSK_PubSub.subscribe($$.CONSTANTS.SWARM_FOR_EXECUTION, function (swarm) {
     const newSwarm = beesHealer.asJSON(swarm, swarm.getMeta('phaseName'), swarm.getMeta('args'));
+    const packedSwarm = SwarmPacker.pack(newSwarm);
 
-    parentPort.postMessage(newSwarm);
+    parentPort.postMessage(packedSwarm);
 });
 

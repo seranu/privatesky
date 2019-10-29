@@ -29,13 +29,7 @@ function AgentWithIsolates(constitutions, workingDir) {
     const workerPool = new WorkerPool(poolManager);
 
     this.executeSwarm = function(swarm, callback) {
-        workerPool.addTask(swarm, (err, swarm) => {
-            if(err) {
-                return callback(err);
-            }
-
-            callback(err, JSON.parse(swarm));
-        });
+        workerPool.addTask(swarm, callback);
     };
 
 }
