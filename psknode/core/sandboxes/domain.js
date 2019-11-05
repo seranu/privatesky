@@ -1,4 +1,5 @@
 const path = require('path');
+require("../utils/pingpongFork").enableLifeLine(1000);
 
 /**
  * These need to be first to allow customization of behavior of libraries in bundles
@@ -17,7 +18,7 @@ require('../../bundles/psknode');
 require('psk-http-client');
 const folderMQ = require("foldermq");
 const fs = require('fs');
-const msgpack = require('@msgpack/msgpack');
+
 const http = require('http');
 const swarmUtils = require("swarmutils");
 const SwarmPacker = swarmUtils.SwarmPacker;
@@ -174,7 +175,6 @@ function connectLocally(alias, path2folder) {
         localReplyHandlerSet = true;
     }
 }
-
 
 function RequestFactory(url) {
     this.createForwardChannel = function (channelName, publicKey, callback) {

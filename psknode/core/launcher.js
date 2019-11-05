@@ -3,10 +3,11 @@
 //the second argument is a path to a temporary folder
 const path = require('path');
 
+require("./utils/pingpongFork").enableLifeLine(1000);
+
 require(path.join(__dirname, '../bundles/pskruntime.js'));
 require(path.join(__dirname, '../bundles/psknode.js'));
 
-const childProcess = require('child_process');
 const fs = require('fs');
 const beesHealer = require('swarmutils').beesHealer;
 
@@ -30,7 +31,7 @@ if (!process.env.PRIVATESKY_TMP) {
 }
 
 const basePath = tmpDir;
-fs.mkdir(basePath, function () {
+fs.mkdir(basePath, {recursive:true}, function () {
 });
 
 const codeFolder = path.normalize(__dirname + "/../");
@@ -77,7 +78,7 @@ function launchDomainSandbox(name, configuration) {
             }
         });
 
-        const child = childProcess.fork(path.join(__dirname, 'sandboxes/domain.js'), [name], {
+        const child = require("./utils/pingpongFork").fork(path.join(__dirname, 'sandboxes/domain.js'), [name], {
             cwd: __dirname,
             env: child_env
         });
@@ -108,7 +109,7 @@ $$.blockchain.start(() => {
 
     if (domains.length > 0) {
         //if we have children launcher will send exit event to them before exiting...
-        require('./utils/exitHandler')(domainSandboxes);
+        //require('./utils/exitHandler')(domainSandboxes);
     } else {
         console.log(`\n[::] No domains were deployed.\n`);
     }
