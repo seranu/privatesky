@@ -35,7 +35,7 @@ module.exports.fork = function pingPongFork(modulePath, args, options){
 module.exports.enableLifeLine = function(timeout){
     let lastConfirmationTime;
     const interval = timeout || 2000;
-console.log(process.argv, timeout);
+
     // this is needed because new Date().getTime() has reduced precision to mitigate timer based attacks
     // for more information see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTime
     const roundingError = 101;

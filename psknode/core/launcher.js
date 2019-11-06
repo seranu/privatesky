@@ -11,7 +11,6 @@ require(path.join(__dirname, '../bundles/psknode.js'));
 const fs = require('fs');
 const beesHealer = require('swarmutils').beesHealer;
 
-//exports.core = require(__dirname+"/core");
 require('launcher');
 require("callflow");
 
@@ -107,10 +106,7 @@ $$.blockchain.start(() => {
         launchDomainSandbox(domain.alias, domain);
     }
 
-    if (domains.length > 0) {
-        //if we have children launcher will send exit event to them before exiting...
-        //require('./utils/exitHandler')(domainSandboxes);
-    } else {
+    if (domains.length === 0) {
         console.log(`\n[::] No domains were deployed.\n`);
     }
 });
