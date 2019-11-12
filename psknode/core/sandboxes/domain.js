@@ -72,9 +72,9 @@ const agentConfig = AgentConfig.createByOverwritingDefaults({
 new ManagerForAgents(agentConfig);
 
 process.nextTick(() => { // to give time to initialize all top level variables
-    for (const alias in domainConfig.remoteInterfaces) {
-        if (domainConfig.remoteInterfaces.hasOwnProperty(alias)) {
-            let remoteUrls = domainConfig.remoteInterfaces[alias];
+    for (const alias in domainConfig.communicationInterfaces) {
+        if (domainConfig.communicationInterfaces.hasOwnProperty(alias)) {
+            let remoteUrls = domainConfig.communicationInterfaces[alias];
             connectToRemote(alias, remoteUrls.virtualMQ, remoteUrls.zeroMQ);
         }
     }
