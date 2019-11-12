@@ -4,14 +4,18 @@ const AgentStrategies = require('../AgentStrategies');
 const PoolManager = require('../PoolManager');
 const WorkerPool = require('../WorkerPool');
 
-
-function AgentWithIsolates(constitutions, workingDir) {
+/**
+ *
+ * @param {AgentConfigStorage} config
+ * @constructor
+ */
+function AgentWithIsolates(config) {
 
     const shimsBundle = fs.readFileSync(path.join(__dirname, '../../../../bundles/sandboxBase.js'), 'utf8');
     const pskruntime = fs.readFileSync(path.join(__dirname, "../../../../bundles/pskruntime.js"), 'utf8');
     const pskNode = fs.readFileSync(path.join(__dirname, "../../../../bundles/psknode.js"), 'utf8');
 
-    constitutions = constitutions.map(constitutionPath => {
+    const constitutions = config.constitutions.map(constitutionPath => {
         return fs.readFileSync(constitutionPath, 'utf8');
     });
 
@@ -21,11 +25,11 @@ function AgentWithIsolates(constitutions, workingDir) {
     };
 
     const options = {
-        workingDir,
+        workingDir: config.workingDir,
         workerOptions
     };
 
-    const poolManager = new PoolManager(options, AgentStrategies.ISOLATES);
+    const poolManager = new PoolManager(options, AgentStrategies.ISOLATES, config.maximumNumberOfWorkers);
     const workerPool = new WorkerPool(poolManager);
 
     this.executeSwarm = function(swarm, callback) {

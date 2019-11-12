@@ -54,10 +54,10 @@ let signatureProvider = blockchain.createSignatureProvider("permissive");
 
 blockchain.createBlockchain(worldStateCache, historyStorage, consensusAlgorithm, signatureProvider, true, false);
 
-const domainSandboxes = {};
+const domains = {};
 
-function launchDomainSandbox(name, configuration) {
-    if (!domainSandboxes[name]) {
+function launchDomain(name, configuration) {
+    if (!domains.hasOwnProperty(name)) {
         const env = {config: JSON.parse(JSON.stringify(beesHealer.asJSON(configuration).publicVars))};
 
         if (Object.keys(env.config.remoteInterfaces).length === 0 && Object.keys(env.config.localInterfaces).length === 0) {
@@ -85,13 +85,13 @@ function launchDomainSandbox(name, configuration) {
         child.on('exit', (code, signal) => {
             setTimeout(() => {
                 console.log(`DomainSandbox [${name}] got an error code ${code}. Restarting...`);
-                delete domainSandboxes[name];
+                delete domains[name];
                 $$.event('status.domains.restart', {name: name});
-                launchDomainSandbox(name, configuration);
+                launchDomain(name, configuration);
             }, 100);
         });
 
-        domainSandboxes[name] = child;
+        domains[name] = child;
     } else {
         console.log('Trying to start a sandbox for a domain that already has a sandbox');
     }
@@ -99,12 +99,11 @@ function launchDomainSandbox(name, configuration) {
 
 
 $$.blockchain.start(() => {
-    let domains = $$.blockchain.loadAssets("DomainReference");
+    let domainReferences = $$.blockchain.loadAssets("DomainReference");
+    domainReferences.forEach(domainReference => {
+        launchDomain(domainReference.alias, domainReference);
+    });
 
-    for (let i = 0; i < domains.length; i++) {
-        let domain = domains[i];
-        launchDomainSandbox(domain.alias, domain);
-    }
 
     if (domains.length === 0) {
         console.log(`\n[::] No domains were deployed.\n`);

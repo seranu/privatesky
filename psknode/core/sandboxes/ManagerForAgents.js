@@ -1,12 +1,15 @@
-const AgentStrategies = require('./util/AgentStrategies');
+const AgentConfig = require('./util/AgentConfig');
 const SwarmPacker = require("swarmutils").SwarmPacker;
 const {getAgent} = require('./Agent');
 
-
-function ManagerForAgents({constitutions, workDir}) {
+/**
+ * @param {AgentConfig} config
+ * @constructor
+ */
+function ManagerForAgents(config) {
 
     // TODO: add capability to initialize more agents
-    const generalAgent = getAgent(constitutions, workDir, AgentStrategies.THREADS);
+    const generalAgent = getAgent(config);
     $$.PSK_PubSub.subscribe($$.CONSTANTS.SWARM_FOR_EXECUTION, executeSwarm, filterSwarmsExecutionRequests);
 
     function isOwnAgent(agent) {
@@ -54,4 +57,4 @@ function ManagerForAgents({constitutions, workDir}) {
 
 }
 
-module.exports = {ManagerForAgents};
+module.exports = {ManagerForAgents, AgentConfig};

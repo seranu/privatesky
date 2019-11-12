@@ -9,7 +9,7 @@ process.env.PRIVATESKY_DOMAIN_NAME = process.argv[2] || "AnonymousDomain" + proc
 process.env.PRIVATESKY_DOMAIN_CONSTITUTION = "../bundles/domain.js";
 process.env.PRIVATESKY_TMP = process.env.PRIVATESKY_TMP || path.resolve("../tmp");
 process.env.DOMAIN_WORKSPACE = path.resolve(process.env.PRIVATESKY_TMP, "domainsWorkspace", process.env.PRIVATESKY_DOMAIN_NAME);
-process.env.vmq_zeromq_sub_address = 'tcp://127.0.0.1:5000';
+process.env.vmq_zeromq_sub_address = process.env.vmq_zeromq_sub_address || 'tcp://127.0.0.1:5000';
 const signatureHeaderName = process.env.vmq_signature_header_name || "x-signature";
 
 require('../../bundles/pskruntime');
@@ -23,19 +23,20 @@ const http = require('http');
 const swarmUtils = require("swarmutils");
 const SwarmPacker = swarmUtils.SwarmPacker;
 const OwM = swarmUtils.OwM;
-const {ManagerForAgents} = require('./ManagerForAgents');
+const {ManagerForAgents, AgentConfig} = require('./ManagerForAgents');
 
 $$.PSK_PubSub = require("soundpubsub").soundPubSub;
 
-$$.log(`Booting domain sandbox... ${process.env.PRIVATESKY_DOMAIN_NAME}`);
-const domain = JSON.parse(process.env.config);
+$$.log(`Booting domain ... ${process.env.PRIVATESKY_DOMAIN_NAME}`);
 
-if (typeof domain.constitution !== "undefined" && domain.constitution !== "undefined") {
-    process.env.PRIVATESKY_DOMAIN_CONSTITUTION = domain.constitution;
+const domainConfig = JSON.parse(process.env.config);
+
+if (typeof domainConfig.constitution !== "undefined" && domainConfig.constitution !== "undefined") {
+    process.env.PRIVATESKY_DOMAIN_CONSTITUTION = domainConfig.constitution;
 }
 
-if (typeof domain.workspace !== "undefined" && domain.workspace !== "undefined") {
-    process.env.DOMAIN_WORKSPACE = domain.workspace;
+if (typeof domainConfig.workspace !== "undefined" && domainConfig.workspace !== "undefined") {
+    process.env.DOMAIN_WORKSPACE = domainConfig.workspace;
 }
 
 //enabling blockchain from confDir
@@ -58,27 +59,31 @@ $$.blockchain.start(() => {
 
 $$.log("Agents will be using constitution file", process.env.PRIVATESKY_DOMAIN_CONSTITUTION);
 
-new ManagerForAgents({
+const agentConfig = AgentConfig.createByOverwritingDefaults({
     constitutions: [
         path.resolve(`${__dirname}/../../bundles/pskruntime.js`),
         path.resolve(process.env.PRIVATESKY_DOMAIN_CONSTITUTION)
     ],
-    workDir: process.env.DOMAIN_WORKSPACE
+    workingDir: process.env.DOMAIN_WORKSPACE,
+    maximumNumberOfWorkers: domainConfig.maximumNumberOfWorkers,
+    workerStrategy: domainConfig.workerStrategy
 });
 
+new ManagerForAgents(agentConfig);
+
 process.nextTick(() => { // to give time to initialize all top level variables
-    for (const alias in domain.remoteInterfaces) {
-        if (domain.remoteInterfaces.hasOwnProperty(alias)) {
-            let remoteUrl = domain.remoteInterfaces[alias];
-            connectToRemote(alias, remoteUrl);
+    for (const alias in domainConfig.remoteInterfaces) {
+        if (domainConfig.remoteInterfaces.hasOwnProperty(alias)) {
+            let remoteUrls = domainConfig.remoteInterfaces[alias];
+            connectToRemote(alias, remoteUrls.virtualMQ, remoteUrls.zeroMQ);
         }
     }
 
     setTimeout(() => {
-        for (let alias in domain.localInterfaces) {
-            if (domain.localInterfaces.hasOwnProperty(alias)) {
+        for (let alias in domainConfig.localInterfaces) {
+            if (domainConfig.localInterfaces.hasOwnProperty(alias)) {
 
-                let path = domain.localInterfaces[alias];
+                let path = domainConfig.localInterfaces[alias];
                 connectLocally(alias, path);
             }
         }
@@ -90,13 +95,13 @@ $$.event('status.domains.boot', {name: process.env.PRIVATESKY_DOMAIN_NAME});
 
 let virtualReplyHandlerSet = false;
 
-function connectToRemote(alias, remoteUrl) {
+function connectToRemote(alias, virtualMQAddress, zeroMQAddress) {
     $$.remote.createRequestManager(1000);
     const listeningChannel = $$.remote.base64Encode(process.env.PRIVATESKY_DOMAIN_NAME);
 
-    $$.log(`\n[***]Alias "${alias}" listening on ${remoteUrl} channel ${listeningChannel}\n`);
+    $$.log(`\n[***]Alias "${alias}" listening on virtualMQ: ${virtualMQAddress} channel ${listeningChannel} and zeroMQ: ${zeroMQAddress}\n`);
 
-    const request = new RequestFactory(remoteUrl);
+    const request = new RequestFactory(virtualMQAddress, zeroMQAddress);
 
     request.createForwardChannel(listeningChannel, 'demo-public-key', (res) => {
         if (res.statusCode >= 400) {
@@ -176,14 +181,15 @@ function connectLocally(alias, path2folder) {
     }
 }
 
-function RequestFactory(url) {
+
+function RequestFactory(virtualMQAddress, zeroMQAddress) {
     this.createForwardChannel = function (channelName, publicKey, callback) {
         const options = {
             path: `/create-channel/${channelName}`,
             method: "PUT"
         };
 
-        const req = http.request(url, options, (res) => {
+        const req = http.request(virtualMQAddress, options, (res) => {
             this.enableForward(channelName, "justASignature", callback);
         });
         req.write(publicKey);
@@ -196,7 +202,7 @@ function RequestFactory(url) {
             method: "POST"
         };
 
-        const req = http.request(url, options, callback);
+        const req = http.request(virtualMQAddress, options, callback);
         req.setHeader(signatureHeaderName, signature);
         req.end();
     };
@@ -212,7 +218,7 @@ function RequestFactory(url) {
             }
         };
 
-        let consumer = zmqIntegration.createZeromqConsumer(process.env.vmq_zeromq_sub_address, catchEvents);
+        let consumer = zmqIntegration.createZeromqConsumer(zeroMQAddress, catchEvents);
         consumer.subscribe(channelName, signature, (channel, receivedMessage) => {
             receivedCallback(JSON.parse(channel.toString()).channelName, receivedMessage.buffer);
         });

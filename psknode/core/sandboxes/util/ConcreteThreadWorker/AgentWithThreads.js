@@ -4,11 +4,17 @@ const PoolManager = require('../PoolManager');
 const SwarmPacker = require("swarmutils").SwarmPacker;
 const WorkerPool = require('../WorkerPool');
 
-
-function AgentWithThreads(constitutions, workingDir) {
+/**
+ *
+ * @param {AgentConfigStorage} config
+ * @constructor
+ */
+function AgentWithThreads(config) {
     const workerOptions = {
-        cwd: workingDir,
-        workerData: {constitutions, cwd: workingDir}
+        cwd: config.workingDir,
+        workerData: {
+            constitutions: config.constitutions
+        }
     };
 
     const poolOptions = {
@@ -16,7 +22,7 @@ function AgentWithThreads(constitutions, workingDir) {
         workerOptions: workerOptions
     };
 
-    const poolManager = new PoolManager(poolOptions, AgentStrategies.THREADS);
+    const poolManager = new PoolManager(poolOptions, AgentStrategies.THREADS, config.maximumNumberOfWorkers);
     const workerPool = new WorkerPool(poolManager);
 
     this.executeSwarm = function(packedSwarm, callback) {

@@ -63,6 +63,7 @@ async function getAgentIsolatesWorker({shimsBundle, constitutions}, workingDir) 
             });
 		`);
 
+    //TODO: this might cause a memory leak
     setInterval(async () => {
         const rawIsolate = isolate.rawIsolate;
         const cpuTime = rawIsolate.cpuTime;
