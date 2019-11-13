@@ -52,5 +52,6 @@ function startProcess(filePath) {
     forkedProcesses[filePath].on('exit', exitHandler(filePath));
 }
 
-startProcess(path.join(__dirname, '../../core/launcher.js'));
+startProcess(path.join(__dirname, 'startZeromqProxy.js'));
 startProcess(path.join(__dirname, 'virtualMq.js'));
+startProcess(path.join(__dirname, '../../core/launcher.js'));
