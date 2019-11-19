@@ -10,10 +10,10 @@ process.env.PRIVATESKY_DOMAIN_CONSTITUTION = "../bundles/domain.js";
 process.env.PRIVATESKY_TMP = process.env.PRIVATESKY_TMP || path.resolve("../tmp");
 process.env.DOMAIN_WORKSPACE = path.resolve(process.env.PRIVATESKY_TMP, "domainsWorkspace", process.env.PRIVATESKY_DOMAIN_NAME);
 process.env.vmq_zeromq_sub_address = process.env.vmq_zeromq_sub_address || 'tcp://127.0.0.1:5000';
-const signatureHeaderName = process.env.vmq_signature_header_name || "x-signature";
 
 require('../../bundles/pskruntime');
 require('../../bundles/psknode');
+require('../../bundles/virtualMQ');
 
 require('psk-http-client');
 const folderMQ = require("foldermq");
@@ -22,6 +22,7 @@ const fs = require('fs');
 const http = require('http');
 const swarmUtils = require("swarmutils");
 const SwarmPacker = swarmUtils.SwarmPacker;
+const VirtualMQ = require('virtualmq');
 const OwM = swarmUtils.OwM;
 const {ManagerForAgents, AgentConfig} = require('./ManagerForAgents');
 
@@ -101,7 +102,7 @@ function connectToRemote(alias, virtualMQAddress, zeroMQAddress) {
 
     $$.log(`\n[***]Alias "${alias}" listening on virtualMQ: ${virtualMQAddress} channel ${listeningChannel} and zeroMQ: ${zeroMQAddress}\n`);
 
-    const request = new RequestFactory(virtualMQAddress, zeroMQAddress);
+    const request = VirtualMQ.getVMQRequestFactory(virtualMQAddress, zeroMQAddress);
 
     request.createForwardChannel(listeningChannel, 'demo-public-key', (res) => {
         if (res.statusCode >= 400) {
@@ -178,49 +179,5 @@ function connectLocally(alias, path2folder) {
             }
         }, () => true);
         localReplyHandlerSet = true;
-    }
-}
-
-
-function RequestFactory(virtualMQAddress, zeroMQAddress) {
-    this.createForwardChannel = function (channelName, publicKey, callback) {
-        const options = {
-            path: `/create-channel/${channelName}`,
-            method: "PUT"
-        };
-
-        const req = http.request(virtualMQAddress, options, (res) => {
-            this.enableForward(channelName, "justASignature", callback);
-        });
-        req.write(publicKey);
-        req.end();
-    };
-
-    this.enableForward = function (channelName, signature, callback) {
-        const options = {
-            path: `/forward-zeromq/${channelName}`,
-            method: "POST"
-        };
-
-        const req = http.request(virtualMQAddress, options, callback);
-        req.setHeader(signatureHeaderName, signature);
-        req.end();
-    };
-
-    this.receiveMessageFromZMQ = function (channelName, signature, readyCallback, receivedCallback) {
-        const zmqIntegration = require("zmq_adapter");
-
-        let catchEvents = (eventType, ...args) => {
-            // console.log("Event type caught", eventType, ...args);
-            if (eventType === "connect") {
-                //connected so all good
-                readyCallback();
-            }
-        };
-
-        let consumer = zmqIntegration.createZeromqConsumer(zeroMQAddress, catchEvents);
-        consumer.subscribe(channelName, signature, (channel, receivedMessage) => {
-            receivedCallback(JSON.parse(channel.toString()).channelName, receivedMessage.buffer);
-        });
     }
 }
