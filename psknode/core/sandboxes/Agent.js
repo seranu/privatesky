@@ -1,29 +1,18 @@
 const AgentStrategies = require('./util/AgentStrategies');
+const Syndicate = require('../../../modules/syndicate');
 const fs = require('fs');
 
 /**
  *
  * @param {AgentConfig&AgentConfigStorage} config
- * @returns {AgentWithThreads|AgentWithIsolates}
+ * @returns {AbstractPool}
  */
 function getAgent(config) {
     if (!fs.existsSync(config.workingDir)) {
         throw new Error(`The provided working directory does not exists ${config.workingDir}`);
     }
 
-    if(!doesStrategyExists(config.workerStrategy)) {
-        throw new Error(`Tried creating agent with invalid strategy ${config.workerStrategy}`);
-    }
-
-    if(config.workerStrategy === AgentStrategies.THREADS) {
-        const AgentWithThreads = require('./util/ConcreteThreadWorker/AgentWithThreads');
-
-        return new AgentWithThreads(config);
-    } else {
-        const AgentWithIsolates = require('./util/ConcreteIsolatesWorker/AgentWithIsolates');
-
-        return new AgentWithIsolates(config);
-    }
+    return Syndicate.createWorkerPool(config);
 }
 
 function doesStrategyExists(strategy) {

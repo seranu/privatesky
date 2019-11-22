@@ -1,9 +1,10 @@
 const AgentConfig = require('./util/AgentConfig');
+const {PoolConfig} = require('../../../modules/syndicate');
 const SwarmPacker = require("swarmutils").SwarmPacker;
 const {getAgent} = require('./Agent');
 
 /**
- * @param {AgentConfig} config
+ * @param {PoolConfig} config
  * @constructor
  */
 function ManagerForAgents(config) {
@@ -21,10 +22,10 @@ function ManagerForAgents(config) {
 
         $$.info("Executing in sandbox towards: ", messageHeader.swarmTarget);
 
-        generalAgent.executeSwarm(packedSwarm, (err, newSwarm) => {
+        generalAgent.addTask(packedSwarm, (err, newSwarm) => {
             if (err) {
-                $$.error('error executing in worker pool', err);
-                // do something
+                $$.err('Error executing in worker pool', err);
+                // send back a new swarm with error?
                 return;
             }
 

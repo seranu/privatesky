@@ -24,7 +24,13 @@ const swarmUtils = require("swarmutils");
 const SwarmPacker = swarmUtils.SwarmPacker;
 const VirtualMQ = require('virtualmq');
 const OwM = swarmUtils.OwM;
-const {ManagerForAgents, AgentConfig} = require('./ManagerForAgents');
+const {ManagerForAgents} = require('./ManagerForAgents');
+const {PoolConfig, WorkerStrategies, getDefaultBootScriptPath} = require('../../../modules/syndicate');
+
+process.on("uncaughtException", (...args) => {
+    console.log('uncaught exception in domain.js', ...args);
+    process.exit(1);
+});
 
 $$.PSK_PubSub = require("soundpubsub").soundPubSub;
 
@@ -60,14 +66,15 @@ $$.blockchain.start(() => {
 
 $$.log("Agents will be using constitution file", process.env.PRIVATESKY_DOMAIN_CONSTITUTION);
 
-const agentConfig = AgentConfig.createByOverwritingDefaults({
+const agentConfig = PoolConfig.createByOverwritingDefaults({
     constitutions: [
         path.resolve(`${__dirname}/../../bundles/pskruntime.js`),
         path.resolve(process.env.PRIVATESKY_DOMAIN_CONSTITUTION)
     ],
     workingDir: process.env.DOMAIN_WORKSPACE,
     maximumNumberOfWorkers: domainConfig.maximumNumberOfWorkers,
-    workerStrategy: domainConfig.workerStrategy
+    workerStrategy: domainConfig.workerStrategy,
+    bootScriptPath: getDefaultBootScriptPath(WorkerStrategies.THREADS)
 });
 
 new ManagerForAgents(agentConfig);
