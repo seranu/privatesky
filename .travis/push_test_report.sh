@@ -6,6 +6,7 @@ setup_git() {
 }
 
 commit_test_report() {
+  git remote add new_origin https://${GIT_TOKEN}@github.com/privatesky/privatesky.git > /dev/null 2>&1
   git checkout -b test_reports
   git pull --all
   git add -f tests/psk-smoke-testing/testReport.html
@@ -13,7 +14,6 @@ commit_test_report() {
 }
 
 push_to_github() {
-  git remote add new_origin https://${GIT_TOKEN}@github.com/privatesky/privatesky.git > /dev/null 2>&1
   git push new_origin test_reports
 }
 
