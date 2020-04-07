@@ -9,6 +9,10 @@ const config = {
     sslFolder: path.resolve(__dirname, '../../conf/ssl')
 };
 
+if(typeof process.env.VMQ_STORAGE_FOLDER !== "undefined"){
+    config.folder = path.resolve(process.env.VMQ_STORAGE_FOLDER);
+}
+
 argumentsParser.populateConfig(config);
 //just in case somebody really need it to change the port from command line arg
 process.env.vmq_port = config.port;
