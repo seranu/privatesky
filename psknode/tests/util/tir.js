@@ -251,7 +251,7 @@ const Tir = function () {
 			];
 
 			const launcherBar = edfs.createBar();
-			launcherBar.addFiles(defaultConstitutionBundlesPath, EDFS.constants.CSB.CONSTITUTION_FOLDER, (err) => {
+			launcherBar.addFiles(defaultConstitutionBundlesPath, "/" + EDFS.constants.CSB.CODE_FOLDER + "/" +EDFS.constants.CSB.CONSTITUTION_FOLDER, (err) => {
 				if (err) {
 					throw err;
 				}
@@ -525,7 +525,7 @@ const Tir = function () {
 				}
 
 				const currentPath = constitutionPaths[index];
-				constitutionArchive.addFolder(currentPath, EDFS.constants.CSB.CONSTITUTION_FOLDER, (err) => {
+				constitutionArchive.addFolder(currentPath, "/" + EDFS.constants.CSB.CODE_FOLDER + "/" + EDFS.constants.CSB.CONSTITUTION_FOLDER, (err) => {
 					if (err) {
 						return callback(err);
 					}
@@ -593,7 +593,7 @@ const Tir = function () {
 			if (err) {
 				return callback(err);
 			}
-			targetArchive.addFile(fileName, `${EDFS.constants.CSB.CONSTITUTION_FOLDER}/domain.js`, callback);
+			targetArchive.addFile(fileName, `/${EDFS.constants.CSB.CODE_FOLDER + "/" + EDFS.constants.CSB.CONSTITUTION_FOLDER}/domain.js`, callback);
 		});
 	}
 
