@@ -40,16 +40,14 @@
     "chokidar": "^3.0.2",
     "updater": "git+http://git@github.com/privatesky/updater.git",
     "isolated-vm": "2.0.3",
-    "source-map-support": "^0.5.13",
-    "zeromq": "^4.6.0"
+    "source-map-support": "^0.5.13"
   },
   "scripts": {
     "preinstall": "node bin/scripts/preinstall-checks.js",
-    "postinstall": "node bin/scripts/install_deps.js && node bin/scripts/githelpers/gitStatusCheck.js .",
     "update": "git pull && npm install",
     "clear-stash": "node bin/scripts/githelpers/gitClearStash.js .",
     "release": "rm -rf psknode/bundles && node bin/scripts/pskbuild.js --projectMap=./builds/build.json --prod=true && node bin/scripts/build-release.js",
-    "build": "node ./bin/scripts/pskbuild.js --jsonInput=true --projectMap={\\\"domain\\\":{\\\"deps\\\":\\\"./../../domain\\\",\\\"autoLoad\\\":true}} && node ./bin/scripts/pskbuild.js --projectMap=./builds/build.json",
+    "build": "node ./bin/scripts/pskbuild.js --projectMap=./builds/domain_build.json && node ./bin/scripts/pskbuild.js --projectMap=./builds/build.json",
     "watch": "node ./bin/scripts/watcher.js --watch ./ --run \"./bin/scripts/pskbuild.js\" --args=\"--projectMap=./builds/build.json\" --ignore=\"/psknode/bundles/,/builds,/tests/,/bin/\"",
     "start": "npm run build && node ./bin/scripts/psknode.js",
     "git-status": "node bin/scripts/githelpers/gitStatusCheck.js .",
