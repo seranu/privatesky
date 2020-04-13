@@ -109,7 +109,9 @@ Object.prototype.onFailure = function (message) {
 
 function dependencyCheckFailed(reason) {
 	console.error(reason);
-	process.exit(1);
+	setTimeout(function(){
+		process.exit(1);
+	}, 100);
 }
 
 function log(...args) {
