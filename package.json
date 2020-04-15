@@ -33,18 +33,17 @@
       "url": "http://www.gnu.org/licenses/lgpl.html"
     }
   ],
-  "comment_for_dependencies": "  // Should remain empty. Add in bin/scripts/build-devel.js",
   "dependencies": {
     "@msgpack/msgpack": "^1.8.0",
     "browserify": "^16.5.0",
     "chokidar": "^3.0.2",
     "isolated-vm": "2.0.3",
     "source-map-support": "^0.5.13",
-    "updater": "git+http://git@github.com/privatesky/updater.git"
+    "octopus": "git+http://git@github.com/privatesky/octopus.git"
   },
   "scripts": {
     "preinstall": "node bin/scripts/preinstall-checks.js",
-    "postinstall": "node bin/scripts/install_deps.js",
+    "postinstall": "node ./node_modules/octopus/scripts/install && node ./node_modules/octopus/scripts/install optionalDependencies",
     "update": "git pull && npm install",
     "clear-stash": "node bin/scripts/githelpers/gitClearStash.js .",
     "release": "rm -rf psknode/bundles && node bin/scripts/pskbuild.js --projectMap=./builds/build.json --prod=true && node bin/scripts/build-release.js",
