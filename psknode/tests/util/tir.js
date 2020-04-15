@@ -10,6 +10,7 @@ require(path.resolve(path.join(process.env.PSK_ROOT_INSTALATION_FOLDER, "psknode
 
 const os = require('os');
 const fs = require('fs');
+const pskPath = require("swarmutils").path;
 
 const createKey = function (name) {
 	let parsed = '' + name;
@@ -251,7 +252,7 @@ const Tir = function () {
 			];
 
 			const launcherBar = edfs.createBar();
-			launcherBar.addFiles(defaultConstitutionBundlesPath, "/" + EDFS.constants.CSB.CODE_FOLDER + "/" +EDFS.constants.CSB.CONSTITUTION_FOLDER, (err) => {
+			launcherBar.addFiles(defaultConstitutionBundlesPath,  pskPath.join(EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER), (err) => {
 				if (err) {
 					throw err;
 				}
@@ -525,7 +526,7 @@ const Tir = function () {
 				}
 
 				const currentPath = constitutionPaths[index];
-				constitutionArchive.addFolder(currentPath, "/" + EDFS.constants.CSB.CODE_FOLDER + "/" + EDFS.constants.CSB.CONSTITUTION_FOLDER, (err) => {
+				constitutionArchive.addFolder(currentPath, pskPath.join(EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER), (err) => {
 					if (err) {
 						return callback(err);
 					}
@@ -593,7 +594,7 @@ const Tir = function () {
 			if (err) {
 				return callback(err);
 			}
-			targetArchive.addFile(fileName, `/${EDFS.constants.CSB.CODE_FOLDER + "/" + EDFS.constants.CSB.CONSTITUTION_FOLDER}/domain.js`, callback);
+			targetArchive.addFile(fileName, pskPath.join(EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER, "domain.js"), callback);
 		});
 	}
 
