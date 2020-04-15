@@ -53,7 +53,17 @@ function startProcess(filePath,  args, options) {
     forkedProcesses[filePath].on('exit', exitHandler(filePath));
 }
 
-startProcess(path.join(__dirname, 'startZeromqProxy.js'));
+let enableZMQ = true;
+try{
+    require("zeromq");
+}catch(err){
+    enableZMQ = false;
+}
+
+if(enableZMQ){
+    startProcess(path.join(__dirname, 'startZeromqProxy.js'));
+}
+
 startProcess(path.join(__dirname, 'virtualMq.js'));
 
 require('../../bundles/virtualMQ');
