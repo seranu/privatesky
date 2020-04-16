@@ -427,8 +427,8 @@ const Tir = function () {
 			const zeroMQPort = getRandomPort();
 			const communicationInterfaces = {
 				system: {
-					virtualMQ: `http://127.0.0.1:${virtualMQPort}`,
-					// zeroMQ: `tcp://127.0.0.1:${zeroMQPort}`
+					virtualMQ: `http://127.0.0.1:${virtualMQPort}`
+					 //zeroMQ: `tcp://127.0.0.1:${zeroMQPort}`
 				}
 			};
 
