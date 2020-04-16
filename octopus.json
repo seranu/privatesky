@@ -90,6 +90,10 @@
 	  "src": "https://github.com/privatesky/psklogger.git"
 	},
 	{
+	  "name": "psk-cache",
+	  "src": "https://github.com/privatesky/psk-cache.git"
+	},
+	{
 	  "name": "psk-security-context",
 	  "src": "https://github.com/privatesky/psk-security-context.git"
 	},
