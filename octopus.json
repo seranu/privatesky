@@ -166,7 +166,7 @@
 	  "actions": [
 		{
 		  "type": "execute",
-		  "cmd": "npm install zeromq@4.6.0 --zmq-external --no-save"
+		  "cmd": "npm install --no-save zeromq@4.6.0 --zmq-external"
 		}
 	  ]
 	}
