@@ -43,9 +43,16 @@ for (let i = 0; i < argv.length; ++i) {
     }
 }
 
-config.watch = config.watch.split(',').map(watchPath => path.resolve(watchPath));
+if (!Array.isArray(config.watch)) {
+    config.watch = config.watch.split(',');
+}
+config.watch = config.watch.map(watchPath => path.resolve(watchPath));
 
 console.log('Watching paths ', config.watch.join(', '));
+
+if (!Array.isArray(config.ignore)) {
+    config.ignore = config.ignore.split(',');
+}
 
 const watcher = chokidar.watch(config.watch, {
     ignored: ['**/.git/**'].concat(config.ignore.map(element => `**${element}**`)),
