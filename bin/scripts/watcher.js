@@ -2,6 +2,13 @@ const chokidar = require('chokidar');
 const childProcess = require('child_process');
 const path = require('path');
 
+const rootDir = path.resolve([
+    __dirname,
+    path.sep,
+    '..',
+    path.sep,
+    '..'
+].join(path.sep));
 
 const config = {
     run: null,
@@ -9,6 +16,7 @@ const config = {
     allowedFileExtensions: ['.js'],
     args: '',
     exec: null,
+    workingDirectory: rootDir,
     ignore: []
 };
 
@@ -147,7 +155,9 @@ function runFile(filePath) {
         forkedProcess.kill();
     }
 
-    forkedProcess = childProcess.fork(filePath, config.args.split(' '))
+    forkedProcess = childProcess.fork(filePath, config.args.split(' '), {
+        cwd: config.workingDirectory
+    });
 }
 
 function runExec() {
@@ -155,7 +165,9 @@ function runExec() {
         execProcess.kill();
     }
 
-    execProcess = childProcess.exec(config.exec, (err, stdout, stderr) => {
+    execProcess = childProcess.exec(config.exec, {
+        cwd: config.workingDirectory
+    }, (err, stdout, stderr) => {
         if (err) {
             console.error(err);
         }
