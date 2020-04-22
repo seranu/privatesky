@@ -2,13 +2,7 @@ const chokidar = require('chokidar');
 const childProcess = require('child_process');
 const path = require('path');
 
-const rootDir = path.resolve([
-    __dirname,
-    path.sep,
-    '..',
-    path.sep,
-    '..'
-].join(path.sep));
+const rootDir = path.resolve([__dirname, '..', '..'].join(path.sep));
 
 const config = {
     run: null,
