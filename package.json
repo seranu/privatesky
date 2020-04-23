@@ -39,7 +39,7 @@
     "chokidar": "^3.0.2",
     "isolated-vm": "2.0.3",
     "source-map-support": "^0.5.13",
-    "octopus": "git+http://git@github.com/privatesky/octopus.git"
+    "octopus": "git+http://git@github.com/privatesky/octopus.git#1.0"
   },
   "scripts": {
     "preinstall": "node bin/scripts/preinstall-checks.js",
