@@ -43,7 +43,7 @@
   },
   "scripts": {
     "preinstall": "node bin/scripts/preinstall-checks.js",
-    "postinstall": "node ./node_modules/octopus/scripts/install && node ./node_modules/octopus/scripts/install optionalDependencies",
+    "postinstall": "node ./node_modules/octopus/scripts/run && node ./node_modules/octopus/scripts/run optionalDependencies",
     "update": "git pull && npm install",
     "clear-stash": "node bin/scripts/githelpers/gitClearStash.js .",
     "release": "rm -rf psknode/bundles && node bin/scripts/pskbuild.js --projectMap=./builds/build.json --prod=true && node bin/scripts/build-release.js",
