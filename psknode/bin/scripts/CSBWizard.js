@@ -5,12 +5,14 @@ const config = {
 };
 
 const path = require('path');
-
 require(path.join(__dirname, '../../bundles/pskruntime'));
-require(path.join(__dirname, '../../bundles/psknode'));
 require(path.join(__dirname, '../../bundles/virtualMQ'));
+require(path.join(__dirname, '../../bundles/edfsBar'));
 require(path.join(__dirname, '../../bundles/consoleTools'));
 
+if (!process.env.PSK_ROOT_INSTALATION_FOLDER) {
+	process.env.PSK_ROOT_INSTALATION_FOLDER = path.join(__dirname, "../../../");
+}
 const CSBWizard  = require('csb-wizard');
 const fs = require('fs');
 
