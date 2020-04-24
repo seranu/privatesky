@@ -30,8 +30,8 @@
 	  "src": "https://github.com/privatesky/choreo.git"
 	},
 	{
-	  "name": "csb-wizard",
-	  "src": "https://github.com/privatesky/csb-wizard.git"
+	  "name": "dossier-wizard",
+	  "src": "https://github.com/privatesky/dossier-wizard.git"
 	},
 	{
 	  "name": "dossier",

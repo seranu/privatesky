@@ -13,7 +13,7 @@ require(path.join(__dirname, '../../bundles/consoleTools'));
 if (!process.env.PSK_ROOT_INSTALATION_FOLDER) {
 	process.env.PSK_ROOT_INSTALATION_FOLDER = path.join(__dirname, "../../../");
 }
-const CSBWizard  = require('csb-wizard');
+const CSBWizard  = require('dossier-wizard');
 const fs = require('fs');
 
 
