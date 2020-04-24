@@ -18,6 +18,7 @@ argumentsParser.populateConfig(config);
 process.env.vmq_port = config.port;
 
 require(path.join(__dirname, '../../bundles/virtualMQ.js'));
+require(path.join(__dirname, '../../bundles/edfsBar.js'));
 require(path.join(__dirname, '../../bundles/consoleTools'));
 
 const VirtualMQ = require('virtualmq');
