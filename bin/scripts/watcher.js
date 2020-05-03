@@ -10,6 +10,7 @@ const config = {
     allowedFileExtensions: ['.js'],
     args: '',
     exec: null,
+
     workingDirectory: rootDir,
     ignore: []
 };
@@ -17,10 +18,12 @@ const config = {
 let forkedProcess;
 let execProcess;
 
+// Hold debounce timeout identifiers
+let timeouts = {};
+
 const argv = Object.assign([], process.argv);
 argv.shift();
 argv.shift();
-
 
 for (let i = 0; i < argv.length; ++i) {
     if (!argv[i].startsWith('--')) {
@@ -36,7 +39,7 @@ for (let i = 0; i < argv.length; ++i) {
         const argumentValue = argument.substr(separatorIndex + 1);
         editConfig(argumentKey, preprocessArgument(argumentValue));
     } else {
-        if (argv[i + 1].startsWith('--')) {
+        if (argv[i] !== '--args' && argv[i + 1].startsWith('--')) {
             throw new Error(`Missing value for argument ${argument}`);
         }
 
@@ -116,6 +119,15 @@ function preprocessArgument(argument) {
     return value;
 }
 
+function getDebounceId(path) {
+    for (let i = 0; i < config.watch.length; i++) {
+        const watchedPath = config.watch[i];
+        if (path.startsWith(watchedPath)) {
+            return watchedPath;
+        }
+    }
+}
+
 function restartServer(path) {
     let match = false;
     let allowedFileExtensions = config.allowedFileExtensions;
@@ -131,16 +143,29 @@ function restartServer(path) {
         return;
     }
 
-    if (config.exec) {
-        runExec();
+    const debounceId = getDebounceId(path);
+    if (!debounceId) {
+        console.error("Somethings wrong. Expected a debounce identifier for path: " + path);
+        return;
     }
 
-    if (config.run) {
-        console.log(`Some event triggered on file ${path}`);
-        runFile(config.run);
-    } else {
-        console.log(`Some event triggered on file ${path}`);
+    function runListener() {
+        if (config.exec) {
+            runExec();
+        }
+
+        if (config.run) {
+            console.log(`Some event triggered on file ${path}`);
+            runFile(config.run);
+        } else {
+            console.log(`Some event triggered on file ${path}`);
+        }
     }
+
+    clearTimeout(timeouts[debounceId]);
+    timeouts[debounceId] = setTimeout(() => {
+        runListener();
+    }, 100);
 }
 
 
