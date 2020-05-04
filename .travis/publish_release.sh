@@ -8,7 +8,7 @@ setup_git() {
 publish_release(){
   npm run prepare-release
   cd temp-release/psk-release
-  git clone https://${GIT_TOKEN}@github.com/privatesky/psk-release.git
+  git remote set-url origin https://${GIT_TOKEN}@github.com/privatesky/psk-release.git
   git add .
   git add -A
   git commit --message "Travis update(Build #$TRAVIS_BUILD_NUMBER)"
