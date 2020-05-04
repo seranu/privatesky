@@ -46,7 +46,7 @@
     "postinstall": "node ./node_modules/octopus/scripts/run && node ./node_modules/octopus/scripts/run optionalDependencies",
     "update": "git pull && npm install",
     "clear-stash": "node bin/scripts/githelpers/gitClearStash.js .",
-    "release": "rm -rf psknode/bundles && node bin/scripts/pskbuild.js --projectMap=./builds/build.json --prod=true && node bin/scripts/build-release.js",
+    "prepare-release": "node ./node_modules/octopus/scripts/run prepare-release",
     "build": "node ./bin/scripts/pskbuild.js --projectMap=./builds/domain_build.json && node ./bin/scripts/pskbuild.js --projectMap=./builds/build.json",
     "watch": "node ./bin/scripts/watcher.js --watch ./ --run \"./bin/scripts/pskbuild.js\" --args=\"--projectMap=./builds/build.json\" --ignore=\"/psknode/bundles/,/builds,/tests/,/bin/\"",
     "start": "npm run build && node ./bin/scripts/psknode.js",
