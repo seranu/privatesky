@@ -21,4 +21,4 @@ assert.callback('Basic Test', (finished) => {
             finished();
         });
     });
-}, 6000);
+}, 15000);

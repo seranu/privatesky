@@ -206,15 +206,19 @@
         },
         {
           "type": "remove",
-          "target": "temp-release/psk-release/psknode/bundles"
+          "target": "temp-release/psk-release/psknode"
         },
         {
           "type": "copy",
           "src": "psknode/bundles/",
-          "target": "temp-release/psk-release/psknode/bundles/",
+          "target": "temp-release/psk-release/psknode",
           "options": {
             "overwrite": true
           }
+        },
+        {
+          "type": "remove",
+          "target": "temp-release/psk-release/psknode/domain.js"
         }
       ]
     }
