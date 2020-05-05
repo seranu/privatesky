@@ -1,7 +1,8 @@
 {
   "port": 8080,
   "zeromqForwardAddress": "tcp://127.0.0.1:5001",
-  "endpoints": {
+  "endpoints": ["virtualMQ", "staticServer", "edfs", "filesManager", "dossierWizard"],
+  "endpointsConfig": {
     "virtualMQ": {
       "channelsFolderName": "channels",
       "maxSize": 100,
@@ -9,11 +10,6 @@
       "tokenHeaderName": "x-tokenHeader",
       "signatureHeaderName": "x-signature",
       "enableSignatureCheck": true
-    },
-    "staticServer": true,
-    "edfs": true,
-    "filesManager": true,
-    "dossierWizard": true
-
+    }
   }
 }
