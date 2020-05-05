@@ -122,8 +122,8 @@
       "src": "https://github.com/privatesky/syndicate.git"
     },
     {
-      "name": "virtualmq",
-      "src": "https://github.com/privatesky/virtualmq.git"
+      "name": "psk-webserver",
+      "src": "https://github.com/privatesky/psk-webserver.git"
     },
     {
       "name": "whys",

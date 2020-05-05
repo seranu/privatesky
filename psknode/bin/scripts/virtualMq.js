@@ -1,11 +1,10 @@
 const path = require("path");
 require("../../core/utils/pingpongFork").enableLifeLine();
-
 require(path.join(__dirname, '../../bundles/virtualMQ.js'));
 require(path.join(__dirname, '../../bundles/edfsBar.js'));
 require(path.join(__dirname, '../../bundles/consoleTools'));
 
-const VirtualMQ = require('virtualmq');
+const VirtualMQ = require('psk-webserver');
 const fs = require('fs');
 const sslFolder = "../../conf/ssl";
 
