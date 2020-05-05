@@ -39,8 +39,7 @@
     "chokidar": "^3.0.2",
     "isolated-vm": "2.0.3",
     "octopus": "git+http://git@github.com/privatesky/octopus.git#1.0",
-    "source-map-support": "^0.5.13",
-    "zeromq": "^4.6.0"
+    "source-map-support": "^0.5.13"
   },
   "scripts": {
     "preinstall": "node bin/scripts/preinstall-checks.js",
