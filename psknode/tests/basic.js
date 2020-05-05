@@ -1,7 +1,7 @@
 const path = require('path');
 require("../bundles/testsRuntime");
 require("../bundles/pskruntime");
-require("../bundles/virtualMQ");
+require("../bundles/pskWebServer");
 
 const tir = require(path.resolve(path.join(__dirname, "util/tir.js")));
 const assert = require('double-check').assert;

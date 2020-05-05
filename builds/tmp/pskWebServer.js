@@ -5,5 +5,5 @@ if(typeof $$ === "undefined" || !$$.environmentType) {
     console.log('VirtualMQ running in test environment');
 }
 
-require("./virtualMQ_intermediar");
+require("./pskWebServer_intermediar");
 require('callflow').initialise();

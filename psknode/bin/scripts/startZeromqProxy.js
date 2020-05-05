@@ -1,4 +1,4 @@
-require('../../bundles/virtualMQ');
+require('../../bundles/pskWebServer');
 
 const integration = require('zmq_adapter');
 const enableSignatureCheck = process.env.enable_signature_check || true;

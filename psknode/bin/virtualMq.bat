@@ -1,2 +1,2 @@
 
-node "%~dp0scripts\virtualMq.js" %*
+node "%~dp0scripts\pskWebServer.js" %*

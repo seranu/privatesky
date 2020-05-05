@@ -6,7 +6,7 @@ const path = require('path');
 process.env.PSK_ROOT_INSTALATION_FOLDER = require("path").join(__dirname, "../../../");
 
 require(path.resolve(path.join(process.env.PSK_ROOT_INSTALATION_FOLDER, "psknode/bundles/edfsBar.js")));
-require(path.resolve(path.join(process.env.PSK_ROOT_INSTALATION_FOLDER, "psknode/bundles/virtualMQ.js")));
+require(path.resolve(path.join(process.env.PSK_ROOT_INSTALATION_FOLDER, "psknode/bundles/pskWebServer.js")));
 
 const os = require('os');
 const fs = require('fs');
@@ -247,7 +247,7 @@ const Tir = function () {
 				path.resolve(path.join(process.env.PSK_ROOT_INSTALATION_FOLDER, "psknode/bundles/pskruntime.js")),
 				path.resolve(path.join(process.env.PSK_ROOT_INSTALATION_FOLDER, "psknode/bundles/edfsBar.js")),
 				path.resolve(path.join(process.env.PSK_ROOT_INSTALATION_FOLDER, "psknode/bundles/blockchain.js")),
-				path.resolve(path.join(process.env.PSK_ROOT_INSTALATION_FOLDER, "psknode/bundles/virtualMQ.js")),
+				path.resolve(path.join(process.env.PSK_ROOT_INSTALATION_FOLDER, "psknode/bundles/pskWebServer.js")),
 				fakeDomainFile
 			];
 

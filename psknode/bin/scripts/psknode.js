@@ -64,9 +64,9 @@ if(enableZMQ){
     startProcess(path.join(__dirname, 'startZeromqProxy.js'));
 }
 
-startProcess(path.join(__dirname, 'virtualMq.js'));
+startProcess(path.join(__dirname, 'pskWebServer.js'));
 
-require('../../bundles/virtualMQ');
+require('../../bundles/pskWebServer');
 require('../../bundles/pskruntime');
 require('../../bundles/blockchain');
 require('../../bundles/edfsBar');
