@@ -12,7 +12,6 @@ const sslFolder = "../../conf/ssl";
 function startServer() {
     let sslConfig = undefined;
     let config = VirtualMQ.getServerConfig();
-    console.log("Config", config);
     console.log('[VirtualMQ] Using certificates from path', path.resolve(sslFolder));
 
     try {
