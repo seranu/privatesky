@@ -24,7 +24,7 @@ function generateTestWallet(endpoint, webappFolder, callback) {
         }
 
         let wallet = edfs.createCSB();
-        wallet.mount("/", "constitution", walletTemplate.getSeed(), function (err) {
+        wallet.mount("/constitution", walletTemplate.getSeed(), function (err) {
             if (err) {
                 throw err;
             }
