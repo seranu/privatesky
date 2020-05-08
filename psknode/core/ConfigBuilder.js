@@ -85,13 +85,13 @@ function createOrUpdateConfiguration(fileConfiguration, callback) {
 				domainConfigDossier.writeFile(EDFS.constants.CSB.DOMAIN_IDENTITY_FILE, defaultDomainName, (err) => {
 					fileConfiguration.domainSeed = domainConfigDossier.getSeed();
 
-					launcherConfigDossier.mount(pskPath.join(EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER), fileConfiguration.constitutionSeed, function (err) {
+					launcherConfigDossier.mount(pskPath.join("/",EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER), fileConfiguration.constitutionSeed, function (err) {
 
 						if (err) {
 							throw err;
 						}
 
-						domainConfigDossier.mount(pskPath.join(EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER), fileConfiguration.constitutionSeed, function (err) {
+						domainConfigDossier.mount(pskPath.join("/",EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER), fileConfiguration.constitutionSeed, function (err) {
 							if (err) {
 								throw err;
 							}
