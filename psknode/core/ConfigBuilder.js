@@ -52,97 +52,121 @@ function createOrUpdateConfiguration(fileConfiguration, callback) {
 	$$.securityContext.generateIdentity((err) => {
 		if (err) throw err;
 		if (fileConfiguration) {
-			let constitutionBar = edfs.loadBar(fileConfiguration.constitutionSeed);
-			constitutionBar.delete("/", (err) => {
-				if (err) {
-					throw err;
-				}
-				constitutionBar.addFolder(constitutionFolder, "/", {encrypt: true}, (err) => {
-					callback(err, fileConfiguration.launcherSeed);
-				});
-			});
+            edfs.loadBar(fileConfiguration.constitutionSeed, (err, constitutionBar) => {
+                if (err) {
+                    throw err;
+                }
+
+                constitutionBar.delete("/", (err) => {
+                    if (err) {
+                        throw err;
+                    }
+                    constitutionBar.addFolder(constitutionFolder, "/", {encrypt: true}, (err) => {
+                        callback(err, fileConfiguration.launcherSeed);
+                    });
+                });
+            });
 		} else {
 			let fileConfiguration = {};
 			let constitutionBar = edfs.createBar();
-			constitutionBar.addFolder(constitutionFolder, "/", {encrypt: true}, (err) => {
-				if (err) {
-					throw err;
-				}
-				fileConfiguration.constitutionSeed = constitutionBar.getSeed();
-				buildDossierInfrastructure(fileConfiguration);
-			});
+            constitutionBar.load((err) => {
+                if (err) {
+                    throw err;
+                }
+
+                constitutionBar.addFolder(constitutionFolder, "/", {encrypt: true}, (err) => {
+                    if (err) {
+                        throw err;
+                    }
+                    fileConfiguration.constitutionSeed = constitutionBar.getSeed();
+                    buildDossierInfrastructure(fileConfiguration);
+                });
+            })
 		}
 
 		function buildDossierInfrastructure(fileConfiguration) {
 			let launcherConfigDossier = edfs.createRawDossier();
-			launcherConfigDossier.writeFile(EDFS.constants.CSB.DOMAIN_IDENTITY_FILE, " ", (err) => {
-				fileConfiguration.launcherSeed = launcherConfigDossier.getSeed();
-				if (err) {
-					throw err;
-				}
+            launcherConfigDossier.load((err) => {
+                if (err) {
+                    throw err;
+                }
 
-				let domainConfigDossier = edfs.createRawDossier();
-				domainConfigDossier.writeFile(EDFS.constants.CSB.DOMAIN_IDENTITY_FILE, defaultDomainName, (err) => {
-					fileConfiguration.domainSeed = domainConfigDossier.getSeed();
+                launcherConfigDossier.writeFile(EDFS.constants.CSB.DOMAIN_IDENTITY_FILE, " ", (err) => {
+                    fileConfiguration.launcherSeed = launcherConfigDossier.getSeed();
+                    if (err) {
+                        throw err;
+                    }
 
-					launcherConfigDossier.mount(pskPath.join(EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER), fileConfiguration.constitutionSeed, function (err) {
+                    let domainConfigDossier = edfs.createRawDossier();
 
-						if (err) {
-							throw err;
-						}
+                    domainConfigDossier.load((err) => {
+                        if (err) {
+                            throw err;
+                        }
 
-						domainConfigDossier.mount(pskPath.join(EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER), fileConfiguration.constitutionSeed, function (err) {
-							if (err) {
-								throw err;
-							}
+                        domainConfigDossier.writeFile(EDFS.constants.CSB.DOMAIN_IDENTITY_FILE, defaultDomainName, (err) => {
+                            fileConfiguration.domainSeed = domainConfigDossier.getSeed();
 
-							domainConfigDossier.readFile(EDFS.constants.CSB.MANIFEST_FILE, function (err, content) {
-								console.log("Getting", err, content.toString());
-								if (err) {
-									throw err;
-								}
-							});
+                            launcherConfigDossier.mount(pskPath.join(EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER), fileConfiguration.constitutionSeed, function (err) {
 
-							dossier.load(fileConfiguration.launcherSeed, identity, (err, launcherCSB) => {
-								if (err) {
-									throw err;
-								}
+                                if (err) {
+                                    throw err;
+                                }
 
-								launcherCSB.startTransaction("Domain", "getDomainDetails", defaultDomainName)
-									.onReturn((err, domainDetails) => {
-										if (err) {
-											//means no demo domain found... let's build it
-											dossier.load(fileConfiguration.domainSeed, identity, (err, domainCSB) => {
-												if (err) {
-													throw err;
-												}
+                                domainConfigDossier.mount(pskPath.join(EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER), fileConfiguration.constitutionSeed, function (err) {
+                                    if (err) {
+                                        throw err;
+                                    }
 
-												launcherCSB.startTransaction("Domain", "add", defaultDomainName, "system", '../../', fileConfiguration.domainSeed)
-													.onReturn((err) => {
-														if (err) {
-															throw err;
-														}
+                                    domainConfigDossier.readFile(EDFS.constants.CSB.MANIFEST_FILE, function (err, content) {
+                                        console.log("Getting", err, content.toString());
+                                        if (err) {
+                                            throw err;
+                                        }
+                                    });
 
-														domainCSB.startTransaction('DomainConfigTransaction', 'add', defaultDomainName, communicationInterfaces)
-															.onReturn((err) => {
-																if (err) {
-																	throw err;
-																}
+                                    dossier.load(fileConfiguration.launcherSeed, identity, (err, launcherCSB) => {
+                                        if (err) {
+                                            throw err;
+                                        }
 
-																fs.writeFileSync(seedFileLocation, JSON.stringify(fileConfiguration), 'utf8');
-																callback(undefined, fileConfiguration.launcherSeed);
-															});
-													});
-											});
-										}
+                                        launcherCSB.startTransaction("Domain", "getDomainDetails", defaultDomainName)
+                                            .onReturn((err, domainDetails) => {
+                                                if (err) {
+                                                    //means no demo domain found... let's build it
+                                                    dossier.load(fileConfiguration.domainSeed, identity, (err, domainCSB) => {
+                                                        if (err) {
+                                                            throw err;
+                                                        }
 
-									});
-							});
-						});
-					});
+                                                        launcherCSB.startTransaction("Domain", "add", defaultDomainName, "system", '../../', fileConfiguration.domainSeed)
+                                                            .onReturn((err) => {
+                                                                if (err) {
+                                                                    throw err;
+                                                                }
 
-				});
-			});
+                                                                domainCSB.startTransaction('DomainConfigTransaction', 'add', defaultDomainName, communicationInterfaces)
+                                                                    .onReturn((err) => {
+                                                                        if (err) {
+                                                                            throw err;
+                                                                        }
+
+                                                                        fs.writeFileSync(seedFileLocation, JSON.stringify(fileConfiguration), 'utf8');
+                                                                        callback(undefined, fileConfiguration.launcherSeed);
+                                                                    });
+                                                            });
+                                                    });
+                                                }
+
+                                            });
+                                    });
+                                });
+                            });
+
+                        });
+                    })
+                });
+            })
 
 		}
 
