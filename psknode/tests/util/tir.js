@@ -252,43 +252,45 @@ const Tir = function () {
 			];
 
 			const launcherBar = edfs.createBar();
-			launcherBar.addFiles(defaultConstitutionBundlesPath,  pskPath.join(EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER), (err) => {
-				if (err) {
-					throw err;
-				}
-
-				const launcherBarSeed = launcherBar.getSeed();
-				const dossier = require("dossier");
-
-				dossier.load(launcherBarSeed, "TIR_AGENT_IDENTITY", (err, csbHandler) => {
+			launcherBar.load((err) => {
+				launcherBar.addFiles(defaultConstitutionBundlesPath,  pskPath.join(EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER), (err) => {
 					if (err) {
 						throw err;
 					}
 
-					global.currentHandler = csbHandler;
-					whenAllFinished(Object.values(domainConfigs), this.buildDomainConfiguration, (err) => {
+					const launcherBarSeed = launcherBar.getSeed();
+					const dossier = require("dossier");
+
+					dossier.load(launcherBarSeed, "TIR_AGENT_IDENTITY", (err, csbHandler) => {
 						if (err) {
 							throw err;
 						}
 
-						const seed = launcherBarSeed;
-
-						testerNode = pingPongFork.fork(
-							path.resolve(path.join(__dirname, "../../core/launcher.js")),
-							[seed, rootFolder],
-							{
-								stdio: 'inherit',
-								env: {
-									PSK_PUBLISH_LOGS_ADDR: `tcp://127.0.0.1:${zeroMQPort}`
-								}
+						global.currentHandler = csbHandler;
+						whenAllFinished(Object.values(domainConfigs), this.buildDomainConfiguration, (err) => {
+							if (err) {
+								throw err;
 							}
-						);
 
-						initializeSwarmEngine(virtualMQPort);
-						prepareTeardownTimeout();
+							const seed = launcherBarSeed;
+
+							testerNode = pingPongFork.fork(
+								path.resolve(path.join(__dirname, "../../core/launcher.js")),
+								[seed, rootFolder],
+								{
+									stdio: 'inherit',
+									env: {
+										PSK_PUBLISH_LOGS_ADDR: `tcp://127.0.0.1:${zeroMQPort}`
+									}
+								}
+							);
+
+							initializeSwarmEngine(virtualMQPort);
+							prepareTeardownTimeout();
+						});
 					});
 				});
-			});
+			})
 		});
 
 		let domainsLeftToStart = Object.keys(domainConfigs).length;
@@ -514,25 +516,31 @@ const Tir = function () {
 			};
 
 			const __addNext = (index = 0) => {
-				if (index >= constitutionPaths.length) {
-
-					if (domainName !== "") {
-						constitutionArchive.writeFile(EDFS.constants.CSB.DOMAIN_IDENTITY_FILE, domainName, lastHandler)
-					} else {
-						lastHandler();
-					}
-
-					return;
-				}
-
-				const currentPath = constitutionPaths[index];
-				constitutionArchive.addFolder(currentPath, pskPath.join(EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER), (err) => {
+				constitutionArchive.load((err) => {
 					if (err) {
-						return callback(err);
+						return lastHandler(err);
 					}
 
-					__addNext(index + 1);
-				});
+					if (index >= constitutionPaths.length) {
+
+						if (domainName !== "") {
+							constitutionArchive.writeFile(EDFS.constants.CSB.DOMAIN_IDENTITY_FILE, domainName, lastHandler)
+						} else {
+							lastHandler();
+						}
+
+						return;
+					}
+
+					const currentPath = constitutionPaths[index];
+					constitutionArchive.addFolder(currentPath, pskPath.join(EDFS.constants.CSB.CODE_FOLDER, EDFS.constants.CSB.CONSTITUTION_FOLDER), (err) => {
+						if (err) {
+							return callback(err);
+						}
+
+						__addNext(index + 1);
+					});
+				})
 			};
 
 			__addNext();
