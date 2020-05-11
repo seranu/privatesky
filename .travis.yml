@@ -10,6 +10,7 @@ before_script:
 after_failure:
   chmod +x .travis/push_test_report.sh && .travis/push_test_report.sh
 after_success:
+  chmod +x .travis/push_test_report.sh && .travis/push_test_report.sh
   chmod +x .travis/publish_release.sh && .travis/publish_release.sh
 notifications:
   email:
