@@ -332,7 +332,7 @@ const Tir = function () {
 				if(maxTries === 0){
 					throw err;
 				}
-				console.log("Retrying", maxTries);
+
 				launchVirtualMQNode(maxTries - 1, storageFolder, callback);
 				return
 			}
