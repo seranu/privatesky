@@ -313,9 +313,6 @@ const Tir = function () {
 	};
 
 	function launchVirtualMQNode(maxTries, storageFolder, callback) {
-		if (maxTries === 0) {
-			return;
-		}
 
 		if (typeof storageFolder === "function") {
 			callback = storageFolder;
@@ -333,6 +330,11 @@ const Tir = function () {
 		process.env.vmq_channel_storage = storageFolder;
 		virtualMQNode = virtualMQ.createVirtualMQ(virtualMQPort, storageFolder, '', err => {
 			if (err) {
+
+				if(maxTries === 0){
+					throw err;
+				}
+				console.log("Retrying", maxTries);
 				launchVirtualMQNode(maxTries - 1, storageFolder, callback);
 				return
 			}
