@@ -4,12 +4,22 @@
   "endpoints": ["virtualMQ", "edfs", "filesManager", "dossierWizard"],
   "endpointsConfig": {
     "virtualMQ": {
+      "path": "./modules/psk-webserver/ChannelsManager.js",
       "channelsFolderName": "channels",
       "maxSize": 100,
       "tokenSize": 48,
       "tokenHeaderName": "x-tokenHeader",
       "signatureHeaderName": "x-signature",
       "enableSignatureCheck": true
+    },
+    "edfs": {
+      "path":"edfs-middleware"
+    },
+    "dossier-wizard": {
+      "path":"dossier-wizard"
+    },
+    "filesManager": {
+      "path":"./modules/psk-webserver/FilesManager.js"
     }
   }
 }
