@@ -27,7 +27,7 @@ function startServer() {
     const listeningPort = Number.parseInt(config.port);
     const rootFolder = path.resolve(config.storage);
 
-    const virtualMq = PskWebServer.createVirtualMQ(listeningPort, rootFolder, sslConfig, (err) => {
+    const virtualMq = PskWebServer.createPskWebServer(listeningPort, rootFolder, sslConfig, (err) => {
         if (err) {
             console.error(err);
         }
