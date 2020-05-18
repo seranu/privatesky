@@ -1,7 +1,7 @@
 {
   "port": 8080,
   "zeromqForwardAddress": "tcp://127.0.0.1:5001",
-  "endpoints": ["virtualMQ", "edfs", "filesManager", "dossier-wizard"],
+  "endpoints": ["virtualMQ", "anchoring","edfs", "filesManager", "dossier-wizard"],
   "endpointsConfig": {
     "virtualMQ": {
       "path": "./modules/psk-webserver/ChannelsManager.js",
@@ -20,6 +20,9 @@
     },
     "filesManager": {
       "path":"./modules/psk-webserver/FilesManager.js"
+    },
+    "anchoring": {
+      "path": "./modules/psk-webserver/AnchoringService.js"
     }
   }
 }

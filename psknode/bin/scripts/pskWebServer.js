@@ -6,19 +6,18 @@ require(path.join(__dirname, '../../bundles/consoleTools'));
 
 const PskWebServer = require('psk-webserver');
 const fs = require('fs');
-const sslFolder = "../../conf/ssl";
 if (!process.env.PSK_ROOT_INSTALATION_FOLDER) {
     process.env.PSK_ROOT_INSTALATION_FOLDER = path.resolve("." + __dirname + "/../..");
 }
 function startServer() {
     let sslConfig = undefined;
     let config = PskWebServer.getServerConfig();
-    console.log('[PskWebServer] Using certificates from path', path.resolve(sslFolder));
+    console.log('[PskWebServer] Using certificates from path', path.resolve(config.sslFolder));
 
     try {
         sslConfig = {
-            cert: fs.readFileSync(path.join(sslFolder, 'server.cert')),
-            key: fs.readFileSync(path.join(sslFolder, 'server.key'))
+            cert: fs.readFileSync(path.join(config.sslFolder, 'server.cert')),
+            key: fs.readFileSync(path.join(config.sslFolder, 'server.key'))
         };
     } catch (e) {
         console.log('[PskWebServer] No certificates found, PskWebServer will start using HTTP');
